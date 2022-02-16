@@ -35,31 +35,12 @@ function read(path) {
 
 async function readhtml(array1) {
 
-    // for(let url in array1){
-    //     if (url != 'http://foozlemcblargh.com') {
-    //         let name = url.replace('http://','');
-    //         let p1Promise = axios.get(url);
-    //         let p1 = await p1Promise;
-    //         html = p1.data
-    //         fs.writeFile(name, html, { encoding: 'utf8', flag: 'a'}, err => {
-    //         if (err) {
-    //             console.log("Error!", err)
-    //         }
-    //         console.log(`wrote to ${name}`)
-    //     } )
-    // }
+    let array2 = []
 
-
-
-    //     }
-        
-  
-  var rithm = (array1[0].replace('http://',''));
-  var postgres = array1[1].replace('http://','');
-  var node = array1[3].replace('http://','');
-
-  
-
+    for(i in array1) {
+        let item = array1[i].replace('http://','');
+        array2.push(item)
+    }
     
   let p1Promise = axios.get(array1[0]);
   let p2Promise = axios.get(array1[1]);
