@@ -5,7 +5,9 @@ const axios = require('axios');
 const { url } = require("inspector");
 const res = require("express/lib/response");
 const { createInflate } = require("zlib");
+const { off } = require("process");
 
+path = filename = process.argv[2];
 
 function read(path) {
     fs.readFile(path, 'utf8', function(err, data) {
@@ -13,80 +15,55 @@ function read(path) {
         console.error(`Error reading ${path}: ${err}`);
         process.exit(1);
       } else {
-
-        array1 = Array()
         
         var lines = data.split('\n');
         lines.forEach(function (line, i) {
-            array1.push(line)
-
-            
-             
+            readhtml(line)
             
         });
-        readhtml(array1)
+   
         }   
     });
   }
 
- 
-
  read(process.argv[2]);
 
-async function readhtml(array1) {
+async function readhtml(line) {
 
-    let array2 = []
+try {
+    let siteName = ''
+    let promise = axios.get(line)
+    let result = await promise
+ 
+    if(line.includes('https://')){
+       siteName = line.replace('https://','');
+       siteName = siteName.split('/')[0];
+       data = result.data
 
-    for(i in array1) {
-        let item = array1[i].replace('http://','');
-        array2.push(item)
+writeFile(siteName, data)
     }
-    
-  let p1Promise = axios.get(array1[0]);
-  let p2Promise = axios.get(array1[1]);
-  let p3Promise = axios.get(array1[3]);
-
-  let p1 = await p1Promise;
-  rithmHtml = p1.data
-  let p2 = await p2Promise;
-  postgresHtml = p2.data
-  let p3 = await p3Promise;
-  nodeHtml = p3.data
-
-  fs.writeFile(rithm, rithmHtml, { encoding: 'utf8', flag: 'a'}, err => {
-      if (err) {
-          console.log("Error!", err)
-      }
-      console.log(`wrote to ${rithm}`)
-  } )
-  fs.writeFile(postgres, postgresHtml, { encoding: 'utf8', flag: 'a'}, err => {
-      if (err) {
-          console.log("Error!", err)
-      }
-      console.log(`wrote to ${postgres}`)
-  } )
-  fs.writeFile('node.org', nodeHtml, { encoding: 'utf8', flag: 'a'}, err => {
-      if (err) {
-          console.log("Error!", err)
-      }
-      console.log('wrote to node.org')
-  } )
-
-
-
-
-
-
-//     createFile()
+else {
+    siteName = line.replace('http://','');
+    data = result.data
+    writeFile(siteName, data)
 }
 
-// function createFile () {
+}
+catch (err) {
+    if(line) {
+        console.log(`couldnt download ${line} `)
+    }
+}
 
+}
 
+function writeFile(fileName, data) {
 
+    fs.writeFile(fileName, data, { encoding: 'utf8', flag: 'a'}, err => {
+        console.log(`wrote to ${fileName}`)
+} )
 
-
-// }
+}
 
 
 
