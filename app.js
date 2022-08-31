@@ -1,22 +1,31 @@
 const express = require('express');
-let axios = require('axios');
+const axios = require('axios');
 const app = express();
+const ExpressError = require('./expressError')
 
-app.post('/', function(req, res, next) {
-  try {
-    let results = req.body.developers.map(async d => {
-      return await axios.get(`https://api.github.com/users/${d}`);
-    });
-    let out = results.map(r => ({ name: r.data.name, bio: r.data.bio }));
+app.use(express.json())
 
-    return res.send(JSON.stringify(out));
-  } catch {
-    next(err);
+app.post('/', async function(req, res, next) {
+
+ let out = []
+try {
+  for(dev of req.body.developers) {
+    let  response = await axios.get(`https://api.github.com/users/${dev}`)
+    let result = await response
+    out.push(result.data)
+
 
   }
+  return res.send(out.map(r => ({ name: r.name, bio: r.bio })));
+}
+catch (err){
+  return next(new ExpressError('unididentified username', 404))
 
-  console.log("post")
+}
+   
+   
 });
+
 
 
 app.listen(3000, function(){
